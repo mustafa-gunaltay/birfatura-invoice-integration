@@ -21,10 +21,12 @@ import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.TaxScheme;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public class XmlUtil {
 
@@ -32,7 +34,7 @@ public class XmlUtil {
             String uuid,
             String invoiceId,
             LocalDate issueDate,
-            String issueTime,
+            String issueTimeStr,
             String currencyCode,
             String profileId,
             String customizationId,
@@ -65,7 +67,17 @@ public class XmlUtil {
             String fileName
     ) throws Exception {
 
+        // Ana Invoice nesnesini oluştur
         Invoice invoice = new Invoice();
+
+        // UBL Extensions - XML'de ilk sırada olmalı
+        UBLExtension extension = new UBLExtension();
+        extension.setExtensionContent(new ExtensionContent());
+        UBLExtensions extensions = new UBLExtensions();
+        extensions.setUblExtension(extension);
+        invoice.setUblExtensions(extensions);
+
+        // Temel fatura bilgileri
         invoice.setUblVersionID("2.1");
         invoice.setCustomizationID(customizationId);
         invoice.setProfileID(profileId);
@@ -73,89 +85,154 @@ public class XmlUtil {
         invoice.setCopyIndicator(false);
         invoice.setUuid(uuid);
         invoice.setIssueDate(issueDate.toString());
-        invoice.setIssueTime(issueTime);
+        invoice.setIssueTime(issueTimeStr);
         invoice.setInvoiceTypeCode(invoiceTypeCode);
         invoice.setDocumentCurrencyCode(currencyCode);
         invoice.setLineCountNumeric(1);
-        invoice.setNote(Collections.singletonList(noteText)); //
 
-        // AdditionalDocumentReference
-        AdditionalDocumentReference xsltDoc = new AdditionalDocumentReference("FIT2024000000001", issueDate.toString(), null, "XSLT");
-        invoice.setAdditionalDocumentReference(List.of(
-                new AdditionalDocumentReference(uuid, issueDate.toString(), null, "CUST_INV_ID"),
-                new AdditionalDocumentReference("0100", issueDate.toString(), null,"OUTPUT_TYPE"),
-                new AdditionalDocumentReference("99", issueDate.toString(), null,"TRANSPORT_TYPE"),
-                new AdditionalDocumentReference("ELEKTRONIK", issueDate.toString(), null,"EREPSENDT"),
+        // Note alanı - XML'deki formata uygun
+        invoice.setNote(Arrays.asList(noteText));
+
+        // Additional Document References - XML'deki sırayla aynı
+        List<AdditionalDocumentReference> additionalRefs = Arrays.asList(
+                new AdditionalDocumentReference("123456", issueDate.toString(), "CUST_INV_ID", null),
+                new AdditionalDocumentReference("0100", issueDate.toString(), "OUTPUT_TYPE", null),
+                new AdditionalDocumentReference("99", issueDate.toString(), "TRANSPORT_TYPE", null),
+                new AdditionalDocumentReference("ELEKTRONIK", issueDate.toString(), "EREPSENDT", null),
                 new AdditionalDocumentReference("0", issueDate.toString(), "SendingType", "KAGIT"),
-                xsltDoc
-        ));
-
-        // Supplier
-        Party supplierParty = new Party();
-        supplierParty.setPartyIdentifications(
-                new PartyIdentification(new PartyIdentification.ID(supplierVkn, "VKN"))
+                new AdditionalDocumentReference("FIT2024000000001", issueDate.toString(), null, "XSLT")
         );
+        invoice.setAdditionalDocumentReference(additionalRefs);
 
+        // Supplier (Satıcı) bilgileri
+        Party supplierParty = new Party();
 
+        // Supplier Party Identification
+        PartyIdentification.ID supplierIdObj = new PartyIdentification.ID(supplierVkn, "VKN");
+        PartyIdentification supplierIdentification = new PartyIdentification(supplierIdObj);
+        supplierParty.setPartyIdentifications(supplierIdentification);
+
+        // Supplier Party Name
         supplierParty.setPartyName(new PartyName(supplierName));
-        supplierParty.setPostalAddress(new Address(supplierStreet, supplierBuildingNumber, supplierSubdivisionName, supplierCity, supplierPostalCode, new Country("Turkiye")));
-        supplierParty.setPartyTaxScheme(new PartyTaxScheme(new tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.supplier.TaxScheme("Ankara")));
-        supplierParty.setContact(new Contact(null, supplierEmail));
-        invoice.setAccountingSupplierParty(new AccountingSupplierParty(supplierParty));
 
-        // Customer
-        CustomerParty customer = new CustomerParty();
-        customer.setPartyIdentification(new CustomerPartyIdentification("TCKN", customerTckn));
-        customer.setPostalAddress(new Address(supplierStreet, supplierBuildingNumber, supplierSubdivisionName, supplierCity, supplierPostalCode, new Country("Turkiye")));
-        customer.setPerson(new Person(customerFirstName, customerLastName));
-        invoice.setAccountingCustomerParty(new AccountingCustomerParty(customer));
+        // Supplier Address
+        Country supplierCountry = new Country("Türkiye");
+        Address supplierAddress = new Address(
+                supplierStreet,
+                supplierBuildingNumber,
+                supplierSubdivisionName,
+                supplierCity,
+                supplierPostalCode,
+                supplierCountry
+        );
+        supplierParty.setPostalAddress(supplierAddress);
 
-        // TaxTotal
-        BigDecimal taxAmount = unitPrice.multiply(BigDecimal.valueOf(taxPercent)).divide(BigDecimal.valueOf(100));
+        // Supplier Tax Scheme
+        TaxScheme supplierTaxScheme = new TaxScheme("KDV", "0015");
+        PartyTaxScheme partyTaxScheme = new PartyTaxScheme(supplierTaxScheme);
+        supplierParty.setPartyTaxScheme(partyTaxScheme);
+
+        // Supplier Contact
+        Contact supplierContact = new Contact(null, supplierEmail);
+        supplierParty.setContact(supplierContact);
+
+        // AccountingSupplierParty'yi set et
+        AccountingSupplierParty accountingSupplierParty = new AccountingSupplierParty(supplierParty);
+        invoice.setAccountingSupplierParty(accountingSupplierParty);
+
+        // Customer (Müşteri) bilgileri
+        CustomerParty customerParty = new CustomerParty();
+
+        // Customer Party Identification
+        CustomerPartyIdentification customerIdentification = new CustomerPartyIdentification("TCKN", customerTckn);
+        customerParty.setPartyIdentification(customerIdentification);
+
+        // Customer Address - müşteri bilgilerini kullan, supplier değil
+        Country customerCountry = new Country("Türkiye");
+        Address customerAddress = new Address(
+                customerStreet,
+                customerBuildingNumber,
+                customerSubdivisionName,
+                customerCity,
+                customerPostalCode,
+                customerCountry
+        );
+        customerParty.setPostalAddress(customerAddress);
+
+        // Customer Person
+        Person customerPerson = new Person(customerFirstName, customerLastName);
+        customerParty.setPerson(customerPerson);
+
+        // AccountingCustomerParty'yi set et
+        AccountingCustomerParty accountingCustomerParty = new AccountingCustomerParty(customerParty);
+        invoice.setAccountingCustomerParty(accountingCustomerParty);
+
+        // Tax hesaplamaları
+        BigDecimal taxableAmount = unitPrice.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal taxAmount = taxableAmount
+                .multiply(BigDecimal.valueOf(taxPercent))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        // Tax Total
         Amount totalTaxAmount = new Amount(currencyCode, taxAmount);
+
+        // Tax Scheme
         TaxScheme taxScheme = new TaxScheme("KDV", "0015");
         TaxCategory taxCategory = new TaxCategory(taxScheme);
-        TaxSubtotal taxSubtotal = new TaxSubtotal(new Amount(currencyCode, unitPrice), new Amount(currencyCode, taxAmount), taxPercent, taxCategory);
+
+        // Tax Subtotal
+        TaxSubtotal taxSubtotal = new TaxSubtotal(
+                new Amount(currencyCode, taxableAmount),
+                new Amount(currencyCode, taxAmount),
+                BigDecimal.valueOf(taxPercent),
+                taxCategory
+        );
+
         TaxTotal taxTotal = new TaxTotal(totalTaxAmount, taxSubtotal);
         invoice.setTaxTotal(taxTotal);
 
-        // LegalMonetaryTotal
-        BigDecimal totalAmount = unitPrice.add(taxAmount);
-        LegalMonetaryTotal monetaryTotal = new LegalMonetaryTotal(
-                new Amount(currencyCode, unitPrice),
-                new Amount(currencyCode, unitPrice),
-                new Amount(currencyCode, totalAmount),
-                new Amount(currencyCode, totalAmount),
-                new Amount(currencyCode, totalAmount)
+        // Legal Monetary Total
+        BigDecimal lineExtensionAmount = taxableAmount;
+        BigDecimal taxExclusiveAmount = taxableAmount;
+        BigDecimal taxInclusiveAmount = taxableAmount.add(taxAmount);
+        BigDecimal payableAmount = taxInclusiveAmount;
+
+        LegalMonetaryTotal legalMonetaryTotal = new LegalMonetaryTotal(
+                new Amount(currencyCode, lineExtensionAmount),
+                new Amount(currencyCode, taxExclusiveAmount),
+                new Amount(currencyCode, taxInclusiveAmount),
+                new Amount(currencyCode, payableAmount),
+                new Amount(currencyCode, payableAmount) // AllowanceTotalAmount için aynı değer
         );
-        invoice.setLegalMonetaryTotal(monetaryTotal);
+        invoice.setLegalMonetaryTotal(legalMonetaryTotal);
 
-        // InvoiceLine
-        InvoiceLine line = new InvoiceLine();
-        line.setId("1");
-        line.setInvoicedQuantity(quantity);
-        line.setLineExtensionAmount(new Amount(currencyCode, unitPrice));
-        line.setItem(new Item(null, itemName));
-        line.setPrice(new Price(new Amount(currencyCode, unitPrice)));
-        invoice.setInvoiceLines(List.of(line));
+        // Invoice Line
+        InvoiceLine.Quantity formattedQuantity = new InvoiceLine.Quantity("NIU", BigDecimal.ONE);
+        InvoiceLine invoiceLine = new InvoiceLine();
+        invoiceLine.setId("1");
+        invoiceLine.setInvoicedQuantity(formattedQuantity);
+        invoiceLine.setLineExtensionAmount(new Amount(currencyCode, lineExtensionAmount));
 
-        // UBL Extensions
-        UBLExtension ext = new UBLExtension();
-        ext.setExtensionContent(new ExtensionContent());
-        UBLExtensions exts = new UBLExtensions();
-        exts.setUblExtension(List.of(ext));
-        invoice.setUblExtensions(exts);
+        // Item
+        Item item = new Item(itemName);
+        invoiceLine.setItem(item);
 
-        // Write to XML
+        // Price
+        Price price = new Price(new Amount(currencyCode, unitPrice));
+        invoiceLine.setPrice(price);
+
+        invoice.setInvoiceLine(invoiceLine);
+
+        // XML dosyasını oluştur
         File file = new File("invoices/" + fileName);
         file.getParentFile().mkdirs();
 
         JAXBContext context = JAXBContext.newInstance(Invoice.class);
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.marshal(invoice, file);
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 
+        marshaller.marshal(invoice, file);
         return file;
     }
 }
-

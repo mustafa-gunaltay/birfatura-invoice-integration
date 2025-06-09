@@ -6,6 +6,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.TaxScheme;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PartyTaxScheme")

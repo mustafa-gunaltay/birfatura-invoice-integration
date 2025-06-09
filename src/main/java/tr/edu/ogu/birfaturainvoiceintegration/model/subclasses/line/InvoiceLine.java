@@ -1,6 +1,7 @@
 package tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.line;
 
 import jakarta.xml.bind.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.Amount;
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.TaxTotal;
@@ -34,6 +35,7 @@ public class InvoiceLine {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Quantity")
     @Data
+    @AllArgsConstructor
     public static class Quantity {
         @XmlAttribute(name = "unitCode")
         private String unitCode;
