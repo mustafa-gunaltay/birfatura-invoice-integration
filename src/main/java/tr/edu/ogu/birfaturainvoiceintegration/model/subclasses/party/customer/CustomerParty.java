@@ -7,7 +7,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Data;
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.supplier.Address;
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.supplier.Contact;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.supplier.PartyIdentification;
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CustomerParty")

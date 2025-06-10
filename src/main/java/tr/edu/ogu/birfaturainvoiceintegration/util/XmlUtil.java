@@ -23,8 +23,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -143,9 +141,19 @@ public class XmlUtil {
         // Customer (Müşteri) bilgileri
         CustomerParty customerParty = new CustomerParty();
 
+
+
         // Customer Party Identification
-        CustomerPartyIdentification customerIdentification = new CustomerPartyIdentification("TCKN", customerTckn);
+//        CustomerPartyIdentification customerIdentification = new CustomerPartyIdentification(customerTckn, "TCKN");
+//        customerParty.setPartyIdentification(customerIdentification);
+
+        // denedigim ikinci versiyon
+        CustomerPartyIdentification.ID customerIdObj = new CustomerPartyIdentification.ID(customerTckn, "TCKN");
+        CustomerPartyIdentification customerIdentification = new CustomerPartyIdentification(customerIdObj);
         customerParty.setPartyIdentification(customerIdentification);
+
+
+
 
         // Customer Address - müşteri bilgilerini kullan, supplier değil
         Country customerCountry = new Country("Türkiye");

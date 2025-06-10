@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PartyIdentification")
+@XmlType(name = "SupplierPartyIdentification")
 public class PartyIdentification {
 
     @XmlElement(name = "ID", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2")
@@ -16,6 +16,7 @@ public class PartyIdentification {
     @Data
     @AllArgsConstructor
     @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "SupplierIDType") // Farklı type name
     public static class ID {
         @XmlValue
         private String value;
@@ -24,4 +25,3 @@ public class PartyIdentification {
         private String schemeID;
     }
 }
-
