@@ -70,6 +70,11 @@
             <version>4.0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <version>3.0.3</version>
+        </dependency>
 
 
     </dependencies>

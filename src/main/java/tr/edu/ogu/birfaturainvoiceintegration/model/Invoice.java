@@ -9,6 +9,7 @@ import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.monetary.LegalMon
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.customer.AccountingCustomerParty;
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.supplier.AccountingSupplierParty;
 import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.TaxTotal;
+import jakarta.xml.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +22,8 @@ import java.util.List;
         "taxTotal", "legalMonetaryTotal", "invoiceLine"
 })
 @Data
+
+
 public class Invoice {
 
     @XmlElement(name = "UBLExtensions", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2")
@@ -80,15 +83,5 @@ public class Invoice {
     @XmlElement(name = "InvoiceLine", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2")
     private InvoiceLine invoiceLine; // birden fazla sey alindiysa List<InvoiceLine> seklinde tanimlanabilir
 
-    @XmlAttribute(name = "xmlns")
-    private final String xmlns = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
 
-    @XmlAttribute(name = "xmlns:cac")
-    private final String xmlnsCac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
-
-    @XmlAttribute(name = "xmlns:cbc")
-    private final String xmlnsCbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
-
-    @XmlAttribute(name = "xmlns:ext")
-    private final String xmlnsExt = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
 }
