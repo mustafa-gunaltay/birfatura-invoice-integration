@@ -81,7 +81,7 @@ public class Invoice {
     private LegalMonetaryTotal legalMonetaryTotal;
 
     @XmlElement(name = "InvoiceLine", namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2")
-    private InvoiceLine invoiceLine; // birden fazla sey alindiysa List<InvoiceLine> seklinde tanimlanabilir
+    private InvoiceLine invoiceLine; // birden fazla urun alindiysa List<InvoiceLine> seklinde tanimlanabilir
 
 
 }

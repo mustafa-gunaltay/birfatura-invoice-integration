@@ -7,9 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
-import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentRequest;
+import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentApiRequest;
+import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentUserRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.ApiResponse;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.SendDocumentResult;
+import tr.edu.ogu.birfaturainvoiceintegration.util.FileUtil;
+import tr.edu.ogu.birfaturainvoiceintegration.util.XmlUtil;
+
+import java.io.File;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +23,7 @@ public class SendDocumentService {
     private final RestClient birFaturaRestClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ApiResponse<SendDocumentResult> sendDocument(SendDocumentRequest request) {
+    public ApiResponse<SendDocumentResult> sendDocument(SendDocumentApiRequest request) {
         try {
             String rawResponse = birFaturaRestClient.post()
                     .uri("/SendDocument")
@@ -38,13 +43,61 @@ public class SendDocumentService {
             throw new RuntimeException("BirFatura başarılı cevabı ayrıştırılamadı", e);
         }
     }
+
+    public ApiResponse<SendDocumentResult> sendDocument(SendDocumentUserRequest request) {
+
+        SendDocumentApiRequest apiRequest = null;
+
+        try {
+            File xmlFile = XmlUtil.createInvoiceXml(
+                    request.getCurrencyCode(),
+                    request.getInvoiceTypeCode(),
+                    request.getNoteText(),
+                    request.getSupplierVkn(),
+                    request.getSupplierName(),
+                    request.getSupplierStreet(),
+                    request.getSupplierBuildingNumber(),
+                    request.getSupplierSubdivisionName(),
+                    request.getSupplierCity(),
+                    request.getSupplierPostalCode(),
+                    request.getSupplierEmail(),
+                    request.getCustomerTckn(),
+                    request.getCustomerFirstName(),
+                    request.getCustomerLastName(),
+                    request.getCustomerStreet(),
+                    request.getCustomerBuildingNumber(),
+                    request.getSupplierSubdivisionName(),
+                    request.getCustomerCity(),
+                    request.getCustomerPostalCode(),
+                    request.getItemName(),
+                    request.getQuantity(),
+                    request.getUnitPrice(),
+                    request.getTaxPercent(),
+                    "test_invoice.xml");
+
+            String base64EncodedZip = FileUtil.zipAndEncode(xmlFile);
+
+            apiRequest = new SendDocumentApiRequest();
+            apiRequest.setReceiverTag("urn:mail:test@firma.com");
+            apiRequest.setDocumentBytes(base64EncodedZip);
+            apiRequest.setDocumentNoAuto(true);
+            apiRequest.setSystemTypeCodes("EARSIV");
+
+
+
+        } catch (Exception e) {
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
+        return sendDocument(apiRequest);
+    }
 }
 
-/*
+/* Notes
 ------ 1 ------
 retrieve() default olarak yalnızca 2xx response’ları kabul eder.
 4xx ya da 5xx dönerse → HttpClientErrorException fırlatır.
-
-
 
  */

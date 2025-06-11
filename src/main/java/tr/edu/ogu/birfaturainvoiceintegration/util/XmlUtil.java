@@ -23,45 +23,43 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class XmlUtil {
 
     public static File createInvoiceXml(
-            String uuid,
-            String invoiceId,
-            LocalDate issueDate,
-            String issueTimeStr,
             String currencyCode,
-            String profileId,
-            String customizationId,
             String invoiceTypeCode,
             String noteText,
             String supplierVkn,
             String supplierName,
             String supplierStreet,
-            String supplierBuildingName,
+
             String supplierBuildingNumber,
             String supplierSubdivisionName,
             String supplierCity,
             String supplierPostalCode,
-            String supplierTaxOffice,
+
             String supplierEmail,
             String customerTckn,
             String customerFirstName,
             String customerLastName,
             String customerStreet,
-            String customerBuildingName,
+
             String customerBuildingNumber,
             String customerSubdivisionName,
             String customerCity,
             String customerPostalCode,
             String itemName,
-            BigDecimal quantity,
-            BigDecimal unitPrice,
+            String quantity,
+            String unitPrice,
             int taxPercent,
-            String outputXsltCode,
+
             String fileName
     ) throws Exception {
 
@@ -77,13 +75,17 @@ public class XmlUtil {
 
         // Temel fatura bilgileri
         invoice.setUblVersionID("2.1");
-        invoice.setCustomizationID(customizationId);
-        invoice.setProfileID(profileId);
-        invoice.setId(invoiceId);
+        invoice.setCustomizationID("TR1.2"); // static for now
+        invoice.setProfileID("EARSIVFATURA"); // static for now
+        invoice.setId("ARS2024000000002"); // static for now
         invoice.setCopyIndicator(false);
-        invoice.setUuid(uuid);
-        invoice.setIssueDate(issueDate.toString());
-        invoice.setIssueTime(issueTimeStr);
+        invoice.setUuid(UUID.randomUUID().toString());
+        invoice.setIssueDate(LocalDate.now().toString());
+
+        OffsetTime now = OffsetTime.now(ZoneOffset.ofHours(3));
+        String formattedTime = now.format(DateTimeFormatter.ofPattern("HH:mm:ssxxx"));
+        invoice.setIssueTime(formattedTime);
+
         invoice.setInvoiceTypeCode(invoiceTypeCode);
         invoice.setDocumentCurrencyCode(currencyCode);
         invoice.setLineCountNumeric(1);
@@ -93,12 +95,12 @@ public class XmlUtil {
 
         // Additional Document References - XML'deki sırayla aynı
         List<AdditionalDocumentReference> additionalRefs = Arrays.asList(
-                new AdditionalDocumentReference("123456", issueDate.toString(), "CUST_INV_ID", null),
-                new AdditionalDocumentReference("0100", issueDate.toString(), "OUTPUT_TYPE", null),
-                new AdditionalDocumentReference("99", issueDate.toString(), "TRANSPORT_TYPE", null),
-                new AdditionalDocumentReference("ELEKTRONIK", issueDate.toString(), "EREPSENDT", null),
-                new AdditionalDocumentReference("0", issueDate.toString(), "SendingType", "KAGIT"),
-                new AdditionalDocumentReference("FIT2024000000001", issueDate.toString(), null, "XSLT")
+                new AdditionalDocumentReference("123456", LocalDate.now().toString(), "CUST_INV_ID", null),
+                new AdditionalDocumentReference("0100", LocalDate.now().toString(), "OUTPUT_TYPE", null),
+                new AdditionalDocumentReference("99", LocalDate.now().toString(), "TRANSPORT_TYPE", null),
+                new AdditionalDocumentReference("ELEKTRONIK", LocalDate.now().toString(), "EREPSENDT", null),
+                new AdditionalDocumentReference("0", LocalDate.now().toString(), "SendingType", "KAGIT"),
+                new AdditionalDocumentReference("FIT2024000000001", LocalDate.now().toString(), null, "XSLT")
         );
         invoice.setAdditionalDocumentReference(additionalRefs);
 
@@ -114,7 +116,7 @@ public class XmlUtil {
         supplierParty.setPartyName(new PartyName(supplierName));
 
         // Supplier Address
-        Country supplierCountry = new Country("Türkiye");
+        Country supplierCountry = new Country("Türkiye"); // static for now
         Address supplierAddress = new Address(
                 supplierStreet,
                 supplierBuildingNumber,
@@ -126,7 +128,7 @@ public class XmlUtil {
         supplierParty.setPostalAddress(supplierAddress);
 
         // Supplier Tax Scheme
-        TaxScheme supplierTaxScheme = new TaxScheme("KDV", "0015");
+        TaxScheme supplierTaxScheme = new TaxScheme("KDV", "0015"); // static for now
         PartyTaxScheme partyTaxScheme = new PartyTaxScheme(supplierTaxScheme);
         supplierParty.setPartyTaxScheme(partyTaxScheme);
 
@@ -144,10 +146,6 @@ public class XmlUtil {
 
 
         // Customer Party Identification
-//        CustomerPartyIdentification customerIdentification = new CustomerPartyIdentification(customerTckn, "TCKN");
-//        customerParty.setPartyIdentification(customerIdentification);
-
-        // denedigim ikinci versiyon
         CustomerPartyIdentification.ID customerIdObj = new CustomerPartyIdentification.ID(customerTckn, "TCKN");
         CustomerPartyIdentification customerIdentification = new CustomerPartyIdentification(customerIdObj);
         customerParty.setPartyIdentification(customerIdentification);
@@ -156,7 +154,7 @@ public class XmlUtil {
 
 
         // Customer Address - müşteri bilgilerini kullan, supplier değil
-        Country customerCountry = new Country("Türkiye");
+        Country customerCountry = new Country("Türkiye"); // static for now
         Address customerAddress = new Address(
                 customerStreet,
                 customerBuildingNumber,
@@ -176,7 +174,8 @@ public class XmlUtil {
         invoice.setAccountingCustomerParty(accountingCustomerParty);
 
         // Tax hesaplamaları
-        BigDecimal taxableAmount = unitPrice.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal formattedUnitPrice = new BigDecimal(unitPrice);
+        BigDecimal taxableAmount = formattedUnitPrice.setScale(2, RoundingMode.HALF_UP);
         BigDecimal taxAmount = taxableAmount
                 .multiply(BigDecimal.valueOf(taxPercent))
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
@@ -185,7 +184,7 @@ public class XmlUtil {
         Amount totalTaxAmount = new Amount(currencyCode, taxAmount);
 
         // Tax Scheme
-        TaxScheme taxScheme = new TaxScheme("KDV", "0015");
+        TaxScheme taxScheme = new TaxScheme("KDV", "0015"); // static for now
         TaxCategory taxCategory = new TaxCategory(taxScheme);
 
         // Tax Subtotal
@@ -215,7 +214,7 @@ public class XmlUtil {
         invoice.setLegalMonetaryTotal(legalMonetaryTotal);
 
         // Invoice Line
-        InvoiceLine.Quantity formattedQuantity = new InvoiceLine.Quantity("NIU", BigDecimal.ONE);
+        InvoiceLine.Quantity formattedQuantity = new InvoiceLine.Quantity("NIU", new BigDecimal(quantity));
         InvoiceLine invoiceLine = new InvoiceLine();
         invoiceLine.setId("1");
         invoiceLine.setInvoicedQuantity(formattedQuantity);
@@ -226,7 +225,7 @@ public class XmlUtil {
         invoiceLine.setItem(item);
 
         // Price
-        Price price = new Price(new Amount(currencyCode, unitPrice));
+        Price price = new Price(new Amount(currencyCode, formattedUnitPrice));
         invoiceLine.setPrice(price);
 
         invoice.setInvoiceLine(invoiceLine);
@@ -242,5 +241,104 @@ public class XmlUtil {
 
         marshaller.marshal(invoice, file);
         return file;
+    }
+
+    public static void createExampleXmlZipAndEncode(){
+        try {
+            // XML'deki değerlerden alınan test parametreleri
+            File xmlFile = XmlUtil.createInvoiceXml(
+
+                    // Currency Code - XML'den alınan
+                    "TRY",
+
+                    // Invoice Type Code - XML'den alınan
+                    "SATIS",
+
+                    // Note Text - XML'den alınan
+                    "",
+
+                    // Supplier VKN - XML'den alınan
+                    "1234567801",
+
+                    // Supplier Name - XML'den alınan
+                    "Test Firma",
+
+                    // Supplier Street - XML'den alınan
+                    "Deneme Sokak",
+
+                    // Supplier Building Number - XML'den alınan
+                    "12",
+
+                    // Supplier Subdivision Name - XML'den alınan
+                    "Çankaya",
+
+                    // Supplier City - XML'den alınan
+                    "Ankara",
+
+                    // Supplier Postal Code - XML'den alınan
+                    "06500",
+
+                    // Supplier Email - XML'den alınan
+                    "info@firma.com",
+
+                    // Customer TCKN - XML'den alınan
+                    "11111111111",
+
+                    // Customer First Name - XML'den alınan
+                    "Ali",
+
+                    // Customer Last Name - XML'den alınan
+                    "Yılmaz",
+
+                    // Customer Street - XML'den alınan
+                    "Alici Sokak",
+
+                    // Customer Building Number - XML'den alınan
+                    "5",
+
+                    // Customer Subdivision Name - XML'den alınan
+                    "Üsküdar",
+
+                    // Customer City - XML'den alınan
+                    "İstanbul",
+
+                    // Customer Postal Code - XML'den alınan
+                    "34000",
+
+                    // Item Name - XML'den alınan
+                    "Ürün Açıklaması",
+
+                    // Quantity - XML'den alınan
+                    "1.000",
+
+                    // Unit Price - XML'den alınan
+                    "100.00",
+
+                    // Tax Percent - XML'den alınan
+                    18,
+
+                    // File Name
+                    "test_invoice.xml"
+            );
+
+            System.out.println("XML dosyası başarıyla oluşturuldu!");
+            System.out.println("Dosya yolu: " + xmlFile.getAbsolutePath());
+            System.out.println("Dosya boyutu: " + xmlFile.length() + " bytes");
+
+            if (xmlFile.exists()) {
+                System.out.println("✅ Dosya başarıyla oluşturuldu ve mevcut.");
+            } else {
+                System.out.println("❌ Dosya oluşturulamadı!");
+            }
+
+            System.out.println("Dosyanin ziplenmis ve base64'e gore encode edilmis stringi:");
+            String base64EncodedZip = FileUtil.zipAndEncode(xmlFile);
+            System.out.println(base64EncodedZip);
+
+
+        } catch (Exception e) {
+            System.err.println("Hata oluştu: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

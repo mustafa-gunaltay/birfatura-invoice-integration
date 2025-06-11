@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentRequest;
+import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentApiRequest;
+import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentUserRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.ApiResponse;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.SendDocumentResult;
 import tr.edu.ogu.birfaturainvoiceintegration.service.SendDocumentService;
@@ -18,18 +19,26 @@ public class SendDocumentController {
 
     private final SendDocumentService sendDocumentService;
 
-    @PostMapping("/send")
-    public ResponseEntity<ApiResponse<SendDocumentResult>> sendDocument(@RequestBody SendDocumentRequest request) {
-        ApiResponse<SendDocumentResult> response = sendDocumentService.sendDocument(request);
+    @PostMapping("/send-direct")
+    public ResponseEntity<ApiResponse<SendDocumentResult>> sendDocument(@RequestBody SendDocumentApiRequest request) {
 
-//        System.out.println("Code: " + response.getCode());
-//        System.out.println("Zipped: " + response.getResult().getZipped());
-//        System.out.println("PDF link: " + response.getResult().getPdfLink());
-        System.out.println(response);
+        ApiResponse<SendDocumentResult> response = sendDocumentService.sendDocument(request);
 
         return ResponseEntity
                 .status(response.isSuccess() ? 200 : 400)
                 .body(response);
     }
+
+
+    @PostMapping("/send-document")
+    public ResponseEntity<ApiResponse<SendDocumentResult>> sendDocument( @RequestBody SendDocumentUserRequest request) {
+
+        ApiResponse<SendDocumentResult> response = sendDocumentService.sendDocument(request);
+
+        return ResponseEntity
+                .status(response.isSuccess() ? 200 : 400)
+                .body(response);
+    }
+
 }
 
