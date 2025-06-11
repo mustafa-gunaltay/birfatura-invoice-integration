@@ -219,6 +219,7 @@ public class XmlUtil {
         invoiceLine.setId("1");
         invoiceLine.setInvoicedQuantity(formattedQuantity);
         invoiceLine.setLineExtensionAmount(new Amount(currencyCode, lineExtensionAmount));
+        invoiceLine.setTaxTotal(taxTotal);
 
         // Item
         Item item = new Item(itemName);
