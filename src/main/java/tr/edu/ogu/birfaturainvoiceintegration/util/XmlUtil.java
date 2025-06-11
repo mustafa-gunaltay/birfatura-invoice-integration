@@ -177,6 +177,7 @@ public class XmlUtil {
         BigDecimal formattedUnitPrice = new BigDecimal(unitPrice);
         BigDecimal taxableAmount = formattedUnitPrice.setScale(2, RoundingMode.HALF_UP);
         BigDecimal taxAmount = taxableAmount
+                .multiply(BigDecimal.valueOf(Integer.parseInt(quantity)))
                 .multiply(BigDecimal.valueOf(taxPercent))
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
 
@@ -199,17 +200,17 @@ public class XmlUtil {
         invoice.setTaxTotal(taxTotal);
 
         // Legal Monetary Total
-        BigDecimal lineExtensionAmount = taxableAmount;
-        BigDecimal taxExclusiveAmount = taxableAmount;
-        BigDecimal taxInclusiveAmount = taxableAmount.add(taxAmount);
+        BigDecimal lineExtensionAmount = taxableAmount.multiply(BigDecimal.valueOf(Integer.parseInt(quantity)));
+        BigDecimal taxExclusiveAmount = lineExtensionAmount;
+        BigDecimal taxInclusiveAmount = taxableAmount.multiply(BigDecimal.valueOf(Integer.parseInt(quantity))).add(taxAmount);
         BigDecimal payableAmount = taxInclusiveAmount;
 
         LegalMonetaryTotal legalMonetaryTotal = new LegalMonetaryTotal(
                 new Amount(currencyCode, lineExtensionAmount),
                 new Amount(currencyCode, taxExclusiveAmount),
                 new Amount(currencyCode, taxInclusiveAmount),
-                new Amount(currencyCode, payableAmount),
-                new Amount(currencyCode, payableAmount) // AllowanceTotalAmount için aynı değer
+                new Amount(currencyCode, BigDecimal.ZERO), // AllowanceTotalAmount is 0 because we suppose there is no discount
+                new Amount(currencyCode, payableAmount)
         );
         invoice.setLegalMonetaryTotal(legalMonetaryTotal);
 

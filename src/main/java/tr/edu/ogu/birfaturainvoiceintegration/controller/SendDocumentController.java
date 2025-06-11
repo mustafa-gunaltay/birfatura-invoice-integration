@@ -2,10 +2,7 @@ package tr.edu.ogu.birfaturainvoiceintegration.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentApiRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentUserRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.ApiResponse;
@@ -15,6 +12,7 @@ import tr.edu.ogu.birfaturainvoiceintegration.service.SendDocumentService;
 @RestController
 @RequestMapping("/api/v1/document")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class SendDocumentController {
 
     private final SendDocumentService sendDocumentService;
@@ -34,6 +32,8 @@ public class SendDocumentController {
     public ResponseEntity<ApiResponse<SendDocumentResult>> sendDocument( @RequestBody SendDocumentUserRequest request) {
 
         ApiResponse<SendDocumentResult> response = sendDocumentService.sendDocument(request);
+
+        System.out.println(response);
 
         return ResponseEntity
                 .status(response.isSuccess() ? 200 : 400)
