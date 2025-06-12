@@ -36,6 +36,21 @@ This project, developed using Java Spring Boot and React, sends e-Invoices via t
 
 
 
+## API Endpoints
+
+### 1. Send Direct Invoice
+- **URL:** /api/v1/document/send-direct
+- **Method:** POST
+- **Request Body:** SendDocumentApiRequest
+- **Description:** Sends an already-prepared UBL XML document (zipped and base64-encoded) to the BirFatura API.
+
+### 2. Generate and Send Invoice
+- **URL:** /api/v1/document/send-document
+- **Method:** POST
+- **Request Body:** SendDocumentUserRequest
+- **Description:** Accepts user-friendly invoice data, generates a UBL invoice XML, compresses and encodes it, and sends it to the BirFatura API.
+
+
 ## Screenshots
 
 
