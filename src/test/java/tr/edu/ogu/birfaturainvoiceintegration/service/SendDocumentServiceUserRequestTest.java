@@ -13,6 +13,9 @@ import tr.edu.ogu.birfaturainvoiceintegration.util.FileUtil;
 import tr.edu.ogu.birfaturainvoiceintegration.util.XmlUtil;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,6 +58,9 @@ class SendDocumentServiceUserRequestTest {
         ) {
             xmlUtilMock
                     .when(() -> XmlUtil.createInvoiceXml(
+                            any(UUID.class),
+                            any(LocalDate.class),
+                            any(OffsetTime.class),
                             any(String.class),
                             any(String.class),
                             any(String.class),

@@ -15,6 +15,10 @@ import tr.edu.ogu.birfaturainvoiceintegration.util.FileUtil;
 import tr.edu.ogu.birfaturainvoiceintegration.util.XmlUtil;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +54,10 @@ public class SendDocumentService {
 
         try {
             File xmlFile = XmlUtil.createInvoiceXml(
+                    UUID.randomUUID(),
+                    LocalDate.now(),
+                    OffsetTime.now(ZoneOffset.ofHours(3)),
+
                     request.getCurrencyCode(),
                     request.getInvoiceTypeCode(),
                     request.getNoteText(),

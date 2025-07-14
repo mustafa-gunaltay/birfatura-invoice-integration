@@ -2,27 +2,27 @@ package tr.edu.ogu.birfaturainvoiceintegration.util;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
-import tr.edu.ogu.birfaturainvoiceintegration.model.*;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.document.AdditionalDocumentReference;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.extension.ExtensionContent;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.extension.UBLExtension;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.extension.UBLExtensions;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.line.InvoiceLine;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.line.Item;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.line.Price;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.monetary.LegalMonetaryTotal;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.customer.AccountingCustomerParty;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.customer.CustomerParty;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.customer.CustomerPartyIdentification;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.customer.Person;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.party.supplier.*;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.*;
-import tr.edu.ogu.birfaturainvoiceintegration.model.subclasses.tax.TaxScheme;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.InvoiceXmlModel;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.document.AdditionalDocumentReference;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.extension.ExtensionContent;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.extension.UBLExtension;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.extension.UBLExtensions;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.line.InvoiceLine;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.line.Item;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.line.Price;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.monetary.LegalMonetaryTotal;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.party.customer.AccountingCustomerParty;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.party.customer.CustomerParty;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.party.customer.CustomerPartyIdentification;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.party.customer.Person;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.party.supplier.*;
+import tr.edu.ogu.birfaturainvoiceintegration.model.xmlmodel.subclasses.tax.*;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -33,38 +33,41 @@ import java.util.UUID;
 public class XmlUtil {
 
     public static File createInvoiceXml(
+            UUID uuid,
+            LocalDate invoiceDate,
+            OffsetTime issueTime,
             String currencyCode,
             String invoiceTypeCode,
             String noteText,
+
             String supplierVkn,
             String supplierName,
             String supplierStreet,
-
             String supplierBuildingNumber,
             String supplierSubdivisionName,
             String supplierCity,
             String supplierPostalCode,
-
             String supplierEmail,
+
             String customerTckn,
             String customerFirstName,
             String customerLastName,
             String customerStreet,
-
             String customerBuildingNumber,
             String customerSubdivisionName,
             String customerCity,
             String customerPostalCode,
+
             String itemName,
             String quantity,
             String unitPrice,
             int taxPercent,
-
             String fileName
+
     ) throws Exception {
 
         // Ana Invoice nesnesini oluştur
-        Invoice invoice = new Invoice();
+        InvoiceXmlModel invoice = new InvoiceXmlModel();
 
         // UBL Extensions - XML'de ilk sırada olmalı
         UBLExtension extension = new UBLExtension();
@@ -79,12 +82,14 @@ public class XmlUtil {
         invoice.setProfileID("EARSIVFATURA"); // static for now
         invoice.setId("ARS2024000000002"); // static for now
         invoice.setCopyIndicator(false);
-        invoice.setUuid(UUID.randomUUID().toString());
-        invoice.setIssueDate(LocalDate.now().toString());
+//        invoice.setUuid(UUID.randomUUID().toString());
+        invoice.setUuid(uuid.toString());
+//        invoice.setIssueDate(LocalDate.now().toString());
+        invoice.setIssueDate(invoiceDate.toString());
 
-        OffsetTime now = OffsetTime.now(ZoneOffset.ofHours(3));
-        String formattedTime = now.format(DateTimeFormatter.ofPattern("HH:mm:ssxxx"));
-        invoice.setIssueTime(formattedTime);
+//        OffsetTime issueTime = OffsetTime.now(ZoneOffset.ofHours(3));
+        String formattedIssueTime = issueTime.format(DateTimeFormatter.ofPattern("HH:mm:ssxxx"));
+        invoice.setIssueTime(formattedIssueTime);
 
         invoice.setInvoiceTypeCode(invoiceTypeCode);
         invoice.setDocumentCurrencyCode(currencyCode);
@@ -236,7 +241,7 @@ public class XmlUtil {
         File file = new File("invoices/" + fileName);
         file.getParentFile().mkdirs();
 
-        JAXBContext context = JAXBContext.newInstance(Invoice.class);
+        JAXBContext context = JAXBContext.newInstance(InvoiceXmlModel.class);
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
@@ -249,6 +254,15 @@ public class XmlUtil {
         try {
             // XML'deki değerlerden alınan test parametreleri
             File xmlFile = XmlUtil.createInvoiceXml(
+
+                    // UUID
+                    UUID.randomUUID(),
+
+                    // Issue Date
+                    LocalDate.now(),
+
+                    // Issue Time
+                    OffsetTime.now(ZoneOffset.ofHours(3)),
 
                     // Currency Code - XML'den alınan
                     "TRY",
