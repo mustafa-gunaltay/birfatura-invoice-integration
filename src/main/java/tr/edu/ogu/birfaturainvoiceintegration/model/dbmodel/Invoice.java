@@ -1,12 +1,14 @@
 package tr.edu.ogu.birfaturainvoiceintegration.model.dbmodel;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
 
+@Data
 @Entity
 @Table(name = "invoice")
 public class Invoice {

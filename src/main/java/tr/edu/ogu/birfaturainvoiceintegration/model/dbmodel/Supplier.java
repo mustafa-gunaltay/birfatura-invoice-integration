@@ -2,7 +2,9 @@ package tr.edu.ogu.birfaturainvoiceintegration.model.dbmodel;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "supplier")
 public class Supplier {
