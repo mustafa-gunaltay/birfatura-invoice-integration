@@ -10,42 +10,42 @@
     <cbc:ProfileID>EARSIVFATURA</cbc:ProfileID>
     <cbc:ID>ARS2024000000002</cbc:ID>
     <cbc:CopyIndicator>false</cbc:CopyIndicator>
-    <cbc:UUID>bf7b2ce0-0660-4e21-80a5-dc32c72b0b6c</cbc:UUID>
-    <cbc:IssueDate>2025-07-15</cbc:IssueDate>
-    <cbc:IssueTime>21:13:06+03:00</cbc:IssueTime>
+    <cbc:UUID>f29d2e2e-0e46-4a33-af60-06474afbe9e3</cbc:UUID>
+    <cbc:IssueDate>2025-08-06</cbc:IssueDate>
+    <cbc:IssueTime>22:01:11+03:00</cbc:IssueTime>
     <cbc:InvoiceTypeCode>SATIS</cbc:InvoiceTypeCode>
     <cbc:DocumentCurrencyCode>TRY</cbc:DocumentCurrencyCode>
     <cbc:LineCountNumeric>1</cbc:LineCountNumeric>
     <cbc:Note>Yalnız Beş Yüz Türk Lirası</cbc:Note>
     <cac:AdditionalDocumentReference>
         <cbc:ID>123456</cbc:ID>
-        <cbc:IssueDate>2025-07-15</cbc:IssueDate>
+        <cbc:IssueDate>2025-08-06</cbc:IssueDate>
         <cbc:DocumentTypeCode>CUST_INV_ID</cbc:DocumentTypeCode>
     </cac:AdditionalDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>0100</cbc:ID>
-        <cbc:IssueDate>2025-07-15</cbc:IssueDate>
+        <cbc:IssueDate>2025-08-06</cbc:IssueDate>
         <cbc:DocumentTypeCode>OUTPUT_TYPE</cbc:DocumentTypeCode>
     </cac:AdditionalDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>99</cbc:ID>
-        <cbc:IssueDate>2025-07-15</cbc:IssueDate>
+        <cbc:IssueDate>2025-08-06</cbc:IssueDate>
         <cbc:DocumentTypeCode>TRANSPORT_TYPE</cbc:DocumentTypeCode>
     </cac:AdditionalDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>ELEKTRONIK</cbc:ID>
-        <cbc:IssueDate>2025-07-15</cbc:IssueDate>
+        <cbc:IssueDate>2025-08-06</cbc:IssueDate>
         <cbc:DocumentTypeCode>EREPSENDT</cbc:DocumentTypeCode>
     </cac:AdditionalDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>0</cbc:ID>
-        <cbc:IssueDate>2025-07-15</cbc:IssueDate>
+        <cbc:IssueDate>2025-08-06</cbc:IssueDate>
         <cbc:DocumentTypeCode>SendingType</cbc:DocumentTypeCode>
         <cbc:DocumentType>KAGIT</cbc:DocumentType>
     </cac:AdditionalDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>FIT2024000000001</cbc:ID>
-        <cbc:IssueDate>2025-07-15</cbc:IssueDate>
+        <cbc:IssueDate>2025-08-06</cbc:IssueDate>
         <cbc:DocumentType>XSLT</cbc:DocumentType>
     </cac:AdditionalDocumentReference>
     <cac:AccountingSupplierParty>
@@ -99,11 +99,11 @@
         </cac:Party>
     </cac:AccountingCustomerParty>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="TRY">768.00</cbc:TaxAmount>
+        <cbc:TaxAmount currencyID="TRY">144.00</cbc:TaxAmount>
         <cac:TaxSubtotal>
             <cbc:TaxableAmount currencyID="TRY">800.00</cbc:TaxableAmount>
-            <cbc:TaxAmount currencyID="TRY">768.00</cbc:TaxAmount>
-            <cbc:Percent>16</cbc:Percent>
+            <cbc:TaxAmount currencyID="TRY">144.00</cbc:TaxAmount>
+            <cbc:Percent>18</cbc:Percent>
             <cac:TaxCategory>
                 <cac:TaxScheme>
                     <cbc:Name>KDV</cbc:Name>
@@ -113,22 +113,22 @@
         </cac:TaxSubtotal>
     </cac:TaxTotal>
     <cac:LegalMonetaryTotal>
-        <cbc:LineExtensionAmount currencyID="TRY">4800.00</cbc:LineExtensionAmount>
-        <cbc:TaxExclusiveAmount currencyID="TRY">4800.00</cbc:TaxExclusiveAmount>
-        <cbc:TaxInclusiveAmount currencyID="TRY">5568.00</cbc:TaxInclusiveAmount>
+        <cbc:LineExtensionAmount currencyID="TRY">800.00</cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="TRY">800.00</cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="TRY">944.00</cbc:TaxInclusiveAmount>
         <cbc:AllowanceTotalAmount currencyID="TRY">0</cbc:AllowanceTotalAmount>
-        <cbc:PayableAmount currencyID="TRY">5568.00</cbc:PayableAmount>
+        <cbc:PayableAmount currencyID="TRY">944.00</cbc:PayableAmount>
     </cac:LegalMonetaryTotal>
     <cac:InvoiceLine>
         <cbc:ID>1</cbc:ID>
-        <cbc:InvoicedQuantity unitCode="NIU">6</cbc:InvoicedQuantity>
-        <cbc:LineExtensionAmount currencyID="TRY">4800.00</cbc:LineExtensionAmount>
+        <cbc:InvoicedQuantity unitCode="NIU">1</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="TRY">800.00</cbc:LineExtensionAmount>
         <cac:TaxTotal>
-            <cbc:TaxAmount currencyID="TRY">768.00</cbc:TaxAmount>
+            <cbc:TaxAmount currencyID="TRY">144.00</cbc:TaxAmount>
             <cac:TaxSubtotal>
                 <cbc:TaxableAmount currencyID="TRY">800.00</cbc:TaxableAmount>
-                <cbc:TaxAmount currencyID="TRY">768.00</cbc:TaxAmount>
-                <cbc:Percent>16</cbc:Percent>
+                <cbc:TaxAmount currencyID="TRY">144.00</cbc:TaxAmount>
+                <cbc:Percent>18</cbc:Percent>
                 <cac:TaxCategory>
                     <cac:TaxScheme>
                         <cbc:Name>KDV</cbc:Name>

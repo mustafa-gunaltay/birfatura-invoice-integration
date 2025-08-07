@@ -11,11 +11,20 @@ import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentApiRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentUserRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.ApiResponse;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.SendDocumentResult;
+import tr.edu.ogu.birfaturainvoiceintegration.model.dbmodel.Customer;
+import tr.edu.ogu.birfaturainvoiceintegration.model.dbmodel.Invoice;
+import tr.edu.ogu.birfaturainvoiceintegration.model.dbmodel.InvoiceItem;
+import tr.edu.ogu.birfaturainvoiceintegration.model.dbmodel.Supplier;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.CustomerRepository;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.InvoiceItemRepository;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.InvoiceRepository;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.SupplierRepository;
 import tr.edu.ogu.birfaturainvoiceintegration.util.FileUtil;
 import tr.edu.ogu.birfaturainvoiceintegration.util.XmlUtil;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
@@ -26,6 +35,10 @@ public class SendDocumentService {
 
     private final RestClient birFaturaRestClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final InvoiceRepository invoiceRepository;
+    private final CustomerRepository customerRepository;
+    private final SupplierRepository supplierRepository;
+    private final InvoiceItemRepository invoiceItemRepository;
 
     public ApiResponse<SendDocumentResult> sendDocument(SendDocumentApiRequest request) {
         try {
@@ -52,11 +65,14 @@ public class SendDocumentService {
 
         SendDocumentApiRequest apiRequest = null;
 
+        UUID randomUUID = UUID.randomUUID();
+        LocalDate now = LocalDate.now();
+        OffsetTime nowTime = OffsetTime.now(ZoneOffset.ofHours(3));
         try {
             File xmlFile = XmlUtil.createInvoiceXml(
-                    UUID.randomUUID(),
-                    LocalDate.now(),
-                    OffsetTime.now(ZoneOffset.ofHours(3)),
+                    randomUUID,
+                    now,
+                    nowTime,
 
                     request.getCurrencyCode(),
                     request.getInvoiceTypeCode(),
@@ -99,7 +115,56 @@ public class SendDocumentService {
         }
 
 
-        return sendDocument(apiRequest);
+        ApiResponse<SendDocumentResult> apiResponse = sendDocument(apiRequest);
+        if (apiResponse.isSuccess()) {
+            // 1. Supplier
+            Supplier supplier = new Supplier();
+            supplier.setTaxNumber(request.getSupplierVkn());
+            supplier.setName(request.getSupplierName());
+            supplier.setEmail(request.getSupplierEmail());
+            supplier.setStreet(request.getSupplierStreet());
+            supplier.setBuildingNo(request.getSupplierBuildingNumber());
+            supplier.setDistrict(request.getSupplierSubdivisionName());
+            supplier.setCity(request.getSupplierCity());
+            supplier.setPostalCode(request.getSupplierPostalCode());
+            supplierRepository.save(supplier);
+
+            // 2. Customer
+            Customer customer = new Customer();
+            customer.setIdNumber(request.getCustomerTckn());
+            customer.setFirstName(request.getCustomerFirstName());
+            customer.setLastName(request.getCustomerLastName());
+            customer.setStreet(request.getCustomerStreet());
+            customer.setBuildingNo(request.getCustomerBuildingNumber());
+            customer.setDistrict(request.getSupplierSubdivisionName()); // dikkat: doğru alan mı?
+            customer.setCity(request.getCustomerCity());
+            customer.setPostalCode(request.getCustomerPostalCode());
+            customerRepository.save(customer);
+
+            // 3. InvoiceItem
+            InvoiceItem item = new InvoiceItem();
+            item.setProductName(request.getItemName());
+            item.setQuantity(Double.parseDouble(request.getQuantity()));
+            item.setUnitPrice(Double.parseDouble(request.getUnitPrice()));
+            item.setTaxRate( (double) request.getTaxPercent());
+            invoiceItemRepository.save(item);
+
+            // 4. Invoice
+            Invoice invoice = new Invoice();
+            invoice.setUuid(randomUUID);
+            invoice.setInvoiceDate(now);
+            invoice.setInvoiceTime(nowTime.toLocalTime());
+            invoice.setPdfUrl(apiResponse.getResult().getPdfLink()); // gelen PDF linki varsa (eger varsa)
+            invoice.setNote(request.getNoteText());
+            invoice.setSupplier(supplier);
+            invoice.setCustomer(customer);
+            invoice.setInvoiceItem(item);
+
+            // 5. Save
+            invoiceRepository.save(invoice);
+        }
+
+        return apiResponse;
     }
 }
 

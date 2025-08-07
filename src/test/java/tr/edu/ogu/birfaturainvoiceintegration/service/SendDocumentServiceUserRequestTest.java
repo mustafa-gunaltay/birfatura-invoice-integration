@@ -9,6 +9,10 @@ import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentApiRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.SendDocumentUserRequest;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.ApiResponse;
 import tr.edu.ogu.birfaturainvoiceintegration.dto.response.SendDocumentResult;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.CustomerRepository;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.InvoiceItemRepository;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.InvoiceRepository;
+import tr.edu.ogu.birfaturainvoiceintegration.repository.SupplierRepository;
 import tr.edu.ogu.birfaturainvoiceintegration.util.FileUtil;
 import tr.edu.ogu.birfaturainvoiceintegration.util.XmlUtil;
 
@@ -25,11 +29,22 @@ class SendDocumentServiceUserRequestTest {
 
     private RestClient restClientMock;
     private SendDocumentService serviceSpy;
+    private InvoiceRepository invoiceRepositoryMock;
+    private CustomerRepository customerRepositoryMock;
+    private SupplierRepository supplierRepositoryMock;
+    private InvoiceItemRepository invoiceItemRepositoryMock;
+
 
     @BeforeEach
     void setUp() {
         restClientMock = mock(RestClient.class);
-        SendDocumentService realService = new SendDocumentService(restClientMock);
+        invoiceRepositoryMock = mock(InvoiceRepository.class);
+        SendDocumentService realService = new SendDocumentService(
+                restClientMock,
+                invoiceRepositoryMock,
+                customerRepositoryMock,
+                supplierRepositoryMock,
+                invoiceItemRepositoryMock);
         serviceSpy = Mockito.spy(realService);
     }
 
