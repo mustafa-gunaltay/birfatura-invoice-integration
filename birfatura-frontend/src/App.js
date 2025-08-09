@@ -702,7 +702,7 @@ const ShowInvoicesPage = ({ setCurrentPage }) => {
                       <div style={styles.detailRow}>
                         <span style={styles.label}>Ürün:</span>
                         <span style={styles.value}>
-                    {invoice.invoiceItem ? invoice.invoiceItem.name : 'N/A'}
+                    {invoice.invoiceItem ? invoice.invoiceItem.productName : 'N/A'}
                   </span>
                       </div>
                       <div style={styles.detailRow}>
