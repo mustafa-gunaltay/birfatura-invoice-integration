@@ -6,11 +6,13 @@ This project, developed using Java Spring Boot and React, sends e-Invoices via t
 
 ## Features
 
-- Collecting invoice data from the user (React frontend)
+- Collecting and managing invoice data via React frontend, including `Show Invoices` and `Automatic Calculation` pages
 - Generating UBL-TR compliant XML invoices (Spring Boot backend)
 - ZIP and Base64 encoding operations
 - Sending e-Invoices via the BirFatura API
 - Displaying the invoice PDF link after successful submission for download
+- Database integration with PostgreSQL via Spring Data JPA & Flyway
+- CRUD operations for `Customer`, `Supplier`, `InvoiceItem`, and `Invoice`
 
 
 
@@ -23,7 +25,8 @@ This project, developed using Java Spring Boot and React, sends e-Invoices via t
 - **Jackson** – JSON serialization and deserialization
 - **SpringDoc OpenAPI** – Swagger UI integration for API documentation
 - **Maven** – Build and dependency management
-
+- **Flyway** – Database version control and schema migration
+- **PostgreSQL** – Relational database
 ### Frontend
 - **React 19** – Frontend UI library
 
@@ -49,6 +52,21 @@ This project, developed using Java Spring Boot and React, sends e-Invoices via t
 - **Method:** POST
 - **Request Body:** SendDocumentUserRequest
 - **Description:** Accepts user-friendly invoice data, generates a UBL invoice XML, compresses and encodes it, and sends it to the BirFatura API.
+
+### 3. Customer CRUD API
+- **URL Base:** /api/customers
+
+### 4. Supplier CRUD API
+- **URL Base:** /api/suppliers
+
+### 5. Invoice Item CRUD API
+- **URL Base:** /api/invoice-items
+
+### 6. Invoice CRUD API
+- **URL Base:** /api/invoices
+
+
+
 
 
 ## Screenshots
